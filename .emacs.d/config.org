@@ -76,6 +76,7 @@ Collection of themes from doom-emacs.
 
     ;; enable custom treemacs theme
     (setq doom-themes-treemacs-theme "doom-colors")
+    (setq doom-themes-treemacs-enable-variable-pitch nil)
     (doom-themes-treemacs-config)
 
     (doom-themes-org-config))
@@ -85,6 +86,7 @@ Collection of themes from doom-emacs.
 Shows what's bound to all the different key chords if you wait after pressing a prefix.
 #+BEGIN_SRC emacs-lisp
   (use-package which-key :ensure t
+    :diminish which-key-mode
     :init (which-key-mode))
 #+END_SRC
 
@@ -115,6 +117,7 @@ Search/completion framework
 #+BEGIN_SRC emacs-lisp
   (use-package ivy :ensure t
     :defer 0.1
+    :diminish ivy-mode
     :custom
     (ivy-count-format "(%d/%d) ")
     (ivy-use-vertical-buffers t)
@@ -124,6 +127,7 @@ Search/completion framework
 #+BEGIN_SRC emacs-lisp
   (use-package counsel :ensure t
     :after ivy
+    :diminish counsel-mode
     :config (counsel-mode))
 #+END_SRC
 
@@ -138,6 +142,7 @@ Search/completion framework
 Highlights hex codes in their color.
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode :ensure t
+    :diminish rainbow-mode
     :init (rainbow-mode 1))
 #+END_SRC
 
@@ -162,14 +167,7 @@ Powerline with spacemacs' theme
 Hides minor modes from the powerline.
 #+BEGIN_SRC emacs-lisp
   (use-package diminish :ensure t
-    :after spaceline
-    :config
-    (mapc #'diminish
-	  '(which-key-mode
-	    ivy-mode
-	    counsel-mode
-	    dante-mode
-	    rainbow-mode)))
+    :after spaceline)
 #+END_SRC
 
 ** all-the-icons
@@ -198,6 +196,7 @@ Interactive haskell mode
 
   (use-package dante :ensure t
     :after haskell-mode
+    :diminish dante-mode
     :commands dante-mode
     :init
     (add-hook 'haskell-mode-hook 'flycheck-hook)
@@ -245,7 +244,6 @@ Nice looking customizable startup screen.
       (switch-to-buffer (get-buffer-create "*scratch*"))
       (lisp-interaction-mode))
     :config
-    (dashboard-setup-startup-hook)
     (setq dashboard-items '((recents . 5)))
     (setq dashboard-banner-logo-title "")
     (setq dashboard-startup-banner 'logo)
@@ -264,6 +262,7 @@ Nice looking customizable startup screen.
 	      "Open config.org for editing."
 	      (lambda (&rest _) (config-edit))
 	      'default)))))
+    (dashboard-setup-startup-hook)
 #+END_SRC
 
 ** magit
@@ -271,6 +270,14 @@ Git integration for emacs.
 #+BEGIN_SRC emacs-lisp
   (use-package magit :ensure t)
 #+END_SRC
+** geiser
+Scheme interaction mode
+#+begin_src emacs-lisp
+  (use-package geiser :ensure t
+    :init
+    (setq geiser-active-implementations '(chicken)))
+#+end_src
+
 * Custom
 ** edit and reload config
 #+BEGIN_SRC emacs-lisp
@@ -291,9 +298,11 @@ Git integration for emacs.
 
 ** org mode elisp snippet shortcut
 #+BEGIN_SRC emacs-lisp
+  (require 'org-tempo) ;; as of 9.2, emacs needs this for it to work
+
   (setq org-src-window-setup 'current-window)
   (add-to-list 'org-structure-template-alist
-	       '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+	     '("el" . "src emacs-lisp"))
 #+END_SRC
 
 ** toggle refill-mode in org
